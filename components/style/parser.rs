@@ -8,11 +8,13 @@ use log;
 use selectors::parser::ParserContext as SelectorParserContext;
 use stylesheets::Origin;
 use url::{Url, UrlParser};
+use msg::constellation_msg::PipelineId;
 
 pub struct ParserContext<'a> {
     pub stylesheet_origin: Origin,
     pub base_url: &'a Url,
     pub selector_context: SelectorParserContext,
+    pub pipelineid: PipelineId,
 }
 
 impl<'a> ParserContext<'a> {
@@ -23,13 +25,14 @@ impl<'a> ParserContext<'a> {
             stylesheet_origin: stylesheet_origin,
             base_url: base_url,
             selector_context: selector_context,
+            pipelineid: pipelineid,
         }
     }
 }
 
 
 impl<'a> ParserContext<'a> {
-    pub fn parse_url(&self, input: &str) -> Url {
+    pub fn parse_url(&self, inp ut: &str) -> Url {
         UrlParser::new().base_url(self.base_url).parse(input)
             .unwrap_or_else(|_| Url::parse("about:invalid").unwrap())
     }
@@ -39,11 +42,10 @@ impl<'a> ParserContext<'a> {
 /// Defaults to a no-op.
 /// Set a `RUST_LOG=style::errors` environment variable
 /// to log CSS parse errors to stderr.
-pub fn log_css_error(input: &mut Parser, position: SourcePosition, message: &str, parsercontext: &ParserContext) {
+pub fn log_css_error(input: &mut Parser, position: SourcePosition, message: &str) {
     if log_enabled!(log::LogLevel::Info) {
         let location = input.source_location(position);
         // TODO eventually this will got into a "web console" or something.
         info!("{}:{} {}", location.line, location.column, message)
     }
-    parsercontext.error_reporter.report_error(input, position, message);
 }
