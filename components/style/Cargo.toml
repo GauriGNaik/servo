@@ -18,6 +18,9 @@ path = "../util"
 [dependencies.style_traits]
 path = "../style_traits"
 
+[dependencies.msg]
+path = "../msg"
+
 [dependencies.url]
 version = "0.2"
 features = [ "serde_serialization" ]
